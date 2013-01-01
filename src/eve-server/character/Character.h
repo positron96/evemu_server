@@ -432,7 +432,7 @@ public:
     /**
      * Updates skill queue.
      */
-    void UpdateSkillQueue();
+    void UpdateSkillQueue(bool saveAfter=true);
 
     /* GrantCertificate( uint32 certificateID )
      *

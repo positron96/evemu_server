@@ -424,7 +424,9 @@ bool Character::_Load()
 
     if( !m_factory.db().LoadSkillQueue( itemID(), m_skillQueue ) )
         return false;
+    sLog.Debug("Character::_Load()", "Loaded skillqueue for char %u %s, %u items loaded", itemID(), itemName().c_str(), m_skillQueue.size() );
 
+    UpdateSkillQueue(false);
     // Calculate total SP trained and store in internal variable:
     _CalculateTotalSPTrained();
 
@@ -728,10 +730,11 @@ void Character::ClearSkillQueue()
     m_skillQueue.clear();
 }
 
-void Character::UpdateSkillQueue()
+void Character::UpdateSkillQueue(bool saveAfter)
 {
     Client *c = m_factory.entity_list.FindCharacter( itemID() );
 
+    sLog.Debug("Character::UpdateSkillQueue()", "called");
     SkillRef currentTraining = GetSkillInTraining();
     if( currentTraining )
     {
@@ -879,8 +882,10 @@ void Character::UpdateSkillQueue()
     _CalculateTotalSPTrained();
 
     // Save character and skill data:
-    SaveCharacter();
-    SaveSkillQueue();
+    if(saveAfter) {
+        SaveCharacter();
+        SaveSkillQueue();
+    }
 }
 
 PyDict *Character::CharGetInfo() {
@@ -1054,6 +1059,7 @@ void Character::SaveCharacter()
     for(; cur != end; cur++)
         cur->get()->SaveAttributes();
         //cur->get()->mAttributeMap.Save();
+    
     SaveCertificates();
 }
 
