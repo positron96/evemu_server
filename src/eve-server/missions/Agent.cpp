@@ -29,7 +29,7 @@
 #include "MissionDB.h"
 
 Agent::Agent(uint32 id)
-: m_agentID(id), m_locationID(0)
+: m_agentID(id)
 {
 }
 
