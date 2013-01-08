@@ -53,6 +53,31 @@ PyObjectEx *MissionDB::GetAgents() {
     return(DBResultToCRowset(res));
 }
 
+bool MissionDB::LoadAgentLocation(uint32 agentID, uint32 &locationID, uint32 &locationType, uint32 &solarSystemID) {
+    DBQueryResult res;
+    if(!sDatabase.RunQuery(res,
+        "SELECT "
+        "   agt.locationID, "
+        "   chr.solarSystemID, "
+        "   itm.typeID "
+        " FROM agtAgents AS agt"
+        " LEFT JOIN characterStatic AS chr ON chr.characterID = agt.agentID"
+        " LEFT JOIN invItems AS itm ON itm.itemID = agt.locationID"
+        " WHERE agt.agentID=%d", agentID
+    ))
+    {
+        sLog.Error("MissionDB.LoadAgentLocation", "Error in query: %s", res.error.c_str());
+        return false;
+    }
+    
+    DBResultRow row;
+    res.GetRow(row);
+    locationID = row.GetUInt(0);
+    solarSystemID = row.GetUInt(1);
+    locationType = row.GetUInt(2);
+    return true;
+}
+
 #ifdef NOT_DONE
 AgentLevel *MissionDB::LoadAgentLevel(uint8 level) {
     AgentLevel *result = new AgentLevel;

@@ -39,6 +39,9 @@ class MissionDB
 public:
     PyObjectEx *GetAgents();
     bool LoadAgentActions(uint32 agentID, std::map<uint32, AgentActions *> &into);
+	
+	bool LoadAgentLocation(uint32 agentID, uint32 &locationID,
+	uint32 &locationType, uint32 &solarSystemID);
 
     //AgentLevel *LoadAgentLevel(uint8 level);
 

@@ -26,9 +26,10 @@
 #include "eve-server.h"
 
 #include "missions/Agent.h"
+#include "MissionDB.h"
 
 Agent::Agent(uint32 id)
-: m_agentID(id)
+: m_agentID(id), m_locationID(0)
 {
 }
 
@@ -42,7 +43,19 @@ Agent::~Agent() {
 }
 
 bool Agent::Load(MissionDB *from) {
-    return true;
+    return from->LoadAgentLocation(m_agentID, m_locationID, m_locationType, m_solarSystemID);
+    //return true;
+}
+
+
+PyRep* Agent::GetLocation() {
+    PyDict *res = new PyDict();
+    
+    res->SetItem("locationID", new PyInt(m_locationID) );
+    res->SetItem("typeID", new PyInt(m_locationType) );
+    res->SetItem("solarsystemID", new PyInt(m_solarSystemID) );
+    
+    return res;
 }
 
 uint32 Agent::GetLoyaltyPoints(Client *who) {

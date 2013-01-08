@@ -166,11 +166,15 @@ public:
 
     uint32 GetLoyaltyPoints(Client *who);
     void DoAction(Client *who, uint32 actionID, std::string &say, std::map<uint32, std::string> &choices);
-
+	PyRep* GetLocation();
+	
 protected:
     const uint32 m_agentID;
     std::map<uint32, AgentActions *> m_actions;    //we own these.
 //    AgentLevel *m_agentLevel;
+	uint32 m_solarSystemID;
+	uint32 m_locationID;
+	uint32 m_locationType;
 };
 
 

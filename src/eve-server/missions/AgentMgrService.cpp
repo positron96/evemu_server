@@ -222,6 +222,8 @@ PyResult AgentMgrBound::Handle_DoAction(PyCallArgs &call) {
     if( !(args.arg->IsInt()) )
     {
         sLog.Error( "AgentMgrBound::Handle_DoAction()", "args.arg->IsInt() failed.  Expected type Int, got type %s", args.arg->TypeString() );
+        //* EVE client calls DoAction without parameters, let's see where it leads.
+        m_agent->DoAction( call.client, 0, res.agentSays, choices );
     }
     else
         m_agent->DoAction( call.client, args.arg->AsInt()->value(), res.agentSays, choices );
@@ -267,9 +269,9 @@ PyResult AgentMgrBound::Handle_GetMissionBriefingInfo(PyCallArgs &call) {
 
 PyResult AgentMgrBound::Handle_GetAgentLocationWrap(PyCallArgs &call) {
 
-    sLog.Debug("Server", "Called GetAgentLocationWrap Stub.");
+    sLog.Debug("Server", "Called GetAgentLocationWrap");
 
-    return NULL;
+    return m_agent->GetLocation();
 }
 
 PyResult AgentMgrBound::Handle_GetMissionObjectiveInfo(PyCallArgs &call) {
