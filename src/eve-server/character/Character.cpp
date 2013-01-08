@@ -1106,7 +1106,8 @@ void Character::_CalculateTotalSPTrained()
         // Calculate exact SP from each skill and add to total SP
         skillLevel = cur->get()->GetAttribute( AttrSkillLevel );
         skillRank = cur->get()->GetAttribute( AttrSkillTimeConstant );
-        totalSP += 250.0f * (double)(skillRank.get_int()) * pow(32.0, (double)(((double)(skillLevel.get_int()) - 1.0f) / 2.0f));
+        //totalSP += 250.0f * (double)(skillRank.get_int()) * pow(32.0, (double)(((double)(skillLevel.get_int()) - 1.0f) / 2.0f));
+        totalSP += EVIL_SKILL_BASE_POINTS * skillRank * e_pow(2, (2.5*(skillLevel - 1)));
     }
 
     m_totalSPtrained = totalSP;

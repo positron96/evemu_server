@@ -393,7 +393,7 @@ public:
     /**
      * Calculates Total Skillpoints the character has trained
      *
-     * @return Skillpoints per minute rate.
+     * @return Total skillpoints trained.
      */
     EvilNumber GetTotalSPTrained() { return m_totalSPtrained; };
     /**
