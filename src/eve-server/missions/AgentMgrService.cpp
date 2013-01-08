@@ -263,8 +263,13 @@ PyResult AgentMgrBound::Handle_GetMyJournalDetails(PyCallArgs &call) {
 PyResult AgentMgrBound::Handle_GetMissionBriefingInfo(PyCallArgs &call) {
 
     sLog.Debug("Server", "Called GetMissionBriefingInfo Stub.");
-
-    return NULL;
+    PyDict *res = new PyDict();
+//    res->SetItem("ContentID");
+//    res->SetItem("Mission Title ID");
+//    res->SetItem("Decline Time");
+//    res->SetItem("Expiration Time");
+            
+    return res;
 }
 
 PyResult AgentMgrBound::Handle_GetAgentLocationWrap(PyCallArgs &call) {
