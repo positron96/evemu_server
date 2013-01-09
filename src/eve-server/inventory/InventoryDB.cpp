@@ -171,7 +171,8 @@ bool InventoryDB::GetBlueprintType(uint32 blueprintTypeID, BlueprintTypeData &in
         " wasteFactor / 100,"   // we have it in db as percentage ...
         " chanceOfReverseEngineering,"
         " maxProductionLimit"
-        " FROM invBlueprintTypes"
+        //" FROM invBlueprintTypes"
+        " FROM bpTypes"
         " WHERE blueprintTypeID=%u",
         blueprintTypeID))
     {
