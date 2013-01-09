@@ -79,7 +79,7 @@ PyResult RamProxyService::Handle_GetJobs2(PyCallArgs &call) {
         }
     }
 
-    return(m_db.GetJobs2(args.ownerID, args.completed, args.fromDate, args.toDate));
+    return(m_db.GetJobs2(args.ownerID, args.completed ));//, args.fromDate, args.toDate));
 }
 
 PyResult RamProxyService::Handle_AssemblyLinesSelect(PyCallArgs &call) {
