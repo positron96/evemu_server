@@ -32,7 +32,7 @@ PyRep *FactoryDB::GetMaterialsForTypeWithActivity(const uint32 blueprintTypeID) 
 
     if(!sDatabase.RunQuery(res,
                 "SELECT requiredTypeID, quantity, damagePerJob, activityID"
-                " FROM typeActivityMaterials"
+                " FROM ramTypeRequirements"
                 " WHERE typeID = %u",
                 blueprintTypeID))
     {

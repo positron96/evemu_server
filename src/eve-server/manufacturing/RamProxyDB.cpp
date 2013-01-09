@@ -371,7 +371,7 @@ bool RamProxyDB::GetRequiredItems(const uint32 typeID, const EVERamActivity acti
         " material.quantity,"
         " material.damagePerJob,"
         " IF(materialGroup.categoryID = 16, 1, 0) AS isSkill"
-        " FROM typeActivityMaterials AS material"
+        " FROM ramTypeRequirements AS material"
         " LEFT JOIN invTypes AS materialType ON material.requiredTypeID = materialType.typeID"
         " LEFT JOIN invGroups AS materialGroup ON materialType.groupID = materialGroup.groupID"
         " WHERE material.typeID = %u"
