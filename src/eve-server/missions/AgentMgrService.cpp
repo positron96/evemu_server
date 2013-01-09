@@ -264,10 +264,13 @@ PyResult AgentMgrBound::Handle_GetMissionBriefingInfo(PyCallArgs &call) {
 
     sLog.Debug("Server", "Called GetMissionBriefingInfo Stub.");
     PyDict *res = new PyDict();
-//    res->SetItem("ContentID");
-//    res->SetItem("Mission Title ID");
-//    res->SetItem("Decline Time");
-//    res->SetItem("Expiration Time");
+    res->SetItem("ContentID", new PyInt(123) ) ;
+    res->SetItem("Mission Keywords", new PyString("Mission Keywords"));
+    res->SetItem("Mission Title ID", new PyString("Mission Title ID") );
+    res->SetItem("Mission Briefing ID", new PyString("Mission Briefing ID") );
+    res->SetItem("Decline Time", new PyInt( Win32TimeNow()+Win32Time_Minute ) );
+    res->SetItem("Expiration Time", new PyInt( Win32TimeNow()+Win32Time_Hour ) );
+    res->SetItem("Mission Image", new PyString("MissionImage") );
             
     return res;
 }
@@ -281,7 +284,7 @@ PyResult AgentMgrBound::Handle_GetAgentLocationWrap(PyCallArgs &call) {
 
 PyResult AgentMgrBound::Handle_GetMissionObjectiveInfo(PyCallArgs &call) {
 
-    sLog.Debug("Server", "Called GetMissionObjectiveInfo Stub.");
+    sLog.Debug("Server", "Called GetMissionObjectiveInfo");
 
     return NULL;
 }

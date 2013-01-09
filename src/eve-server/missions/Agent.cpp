@@ -103,9 +103,13 @@ void Agent::DoAction(
     loyaltyPoints = action->loyaltyPoints;
     */
 
-    say = "What do you want? Spit it out, stooge.";
-    choices[1] = "I want work, do you have anything?";
-    choices[2] = "I need to find somebody.  Can you help me?";
+    char v[256];
+    sprintf(v, "Result of DoAction(%d)", actionID);
+    say = v;  //"What do you want? Spit it out, stooge. ";
+    //request mission = 2
+    choices[2] = "I want work, do you have anything?";
+    //locate char = 15
+    choices[15] = "I need to find somebody.  Can you help me?";
 }
 
 
