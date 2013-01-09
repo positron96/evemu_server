@@ -27,7 +27,7 @@
 
 #include "manufacturing/RamProxyDB.h"
 
-PyRep *RamProxyDB::GetJobs2(const uint32 ownerID, const bool completed, const uint64 fromDate, const uint64 toDate) {
+PyRep *RamProxyDB::GetJobs2(const uint32 ownerID, const bool completed) {//, const uint64 fromDate, const uint64 toDate) {
     DBQueryResult res;
 
     if(!sDatabase.RunQuery(res,
@@ -64,10 +64,10 @@ PyRep *RamProxyDB::GetJobs2(const uint32 ownerID, const bool completed, const ui
         " LEFT JOIN ramAssemblyLineStations AS station ON assemblyLine.containerID = station.stationID"
         " WHERE job.ownerID = %u"
         " AND job.completedStatusID %s 0"
-        " AND job.installTime >= %" PRIu64
-        " AND job.endProductionTime <= %" PRIu64
+        //" AND job.installTime >= %" PRIu64
+        //" AND job.endProductionTime <= %" PRIu64
         " GROUP BY job.jobID",
-        ownerID, (completed ? "!=" : "="), fromDate, toDate))
+        ownerID, (completed ? "!=" : "=") ))//, fromDate, toDate))
     {
         _log(DATABASE__ERROR, "Failed to query jobs for owner %u: %s", ownerID, res.error.c_str());
         return NULL;
