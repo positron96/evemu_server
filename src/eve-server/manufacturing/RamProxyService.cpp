@@ -150,7 +150,7 @@ PyResult RamProxyService::Handle_InstallJob(PyCallArgs &call) {
         return NULL;
 
     // I understand sent maxJobStartTime as a limit, so this checks whether it's in limit
-    if(rsp.maxJobStartTime > call.byname["maxJobStartTime"]->AsInt()->value())
+    if(rsp.maxJobStartTime > call.byname["maxJobStartTime"]->AsLong()->value())
         throw(PyException(MakeUserError("RamCannotGuaranteeStartTime")));
 
     // query required items for activity

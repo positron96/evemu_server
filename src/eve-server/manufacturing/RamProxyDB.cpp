@@ -198,7 +198,7 @@ PyRep *RamProxyDB::AssemblyLinesGet(const uint32 containerID) {
         return NULL;
     }
 
-    return DBResultToRowset(res);
+    return DBResultToCRowset(res);
 }
 
 bool RamProxyDB::GetAssemblyLineProperties(const uint32 assemblyLineID, double &baseMaterialMultiplier, double &baseTimeMultiplier, double &costInstall, double &costPerHour) {
