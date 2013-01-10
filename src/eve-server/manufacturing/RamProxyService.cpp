@@ -52,9 +52,9 @@ RamProxyService::~RamProxyService() {
 
 PyResult RamProxyService::Handle_AssemblyLinesSelectPublic(PyCallArgs &call) {
 
-    sLog.Debug("Server", "Called AsemblyLinesSelectPublic Stub.");
+    sLog.Debug("Server", "Called AsemblyLinesSelectPublic.");
 
-    return new PyList;
+    return(m_db.AssemblyLinesSelectPublic(call.client->GetRegionID()));
 }
 
 PyResult RamProxyService::Handle_GetRelevantCharSkills(PyCallArgs &call) {

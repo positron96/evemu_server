@@ -86,9 +86,11 @@ PyRep *RamProxyDB::AssemblyLinesSelectPublic(const uint32 regionID) {
         " station.solarSystemID AS containerLocationID,"
         " station.assemblyLineTypeID,"
         " station.quantity,"
-        " station.ownerID"
+        " station.ownerID,"
+        " types.activityID"
         " FROM ramAssemblyLineStations AS station"
         " LEFT JOIN crpNPCCorporations AS corp ON station.ownerID = corp.corporationID"
+        " LEFT JOIN ramAssemblyLineTypes as types ON station.assemblyLineTypeID = types.assemblyLineTypeID"
         " WHERE station.ownerID = corp.corporationID"
         " AND station.regionID = %u",
         regionID))
@@ -96,8 +98,8 @@ PyRep *RamProxyDB::AssemblyLinesSelectPublic(const uint32 regionID) {
         _log(DATABASE__ERROR, "Failed to query public assembly lines for region %u: %s.", regionID, res.error.c_str());
         return NULL;
     }
-
-    return DBResultToRowset(res);
+    
+    return DBResultToCRowset(res); 
 }
 PyRep *RamProxyDB::AssemblyLinesSelectPersonal(const uint32 charID) {
     DBQueryResult res;
