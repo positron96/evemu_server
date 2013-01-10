@@ -792,10 +792,10 @@ bool RamProxyService::_Calculate(const Call_InstallJob &args, InventoryItemRef i
             into.charTimeMultiplier = c->GetChar()->GetAttribute(AttrManufactureTimeMultiplier).get_float();
 
             switch(productType->race()) {
-                case raceCaldari:       into.charTimeMultiplier *= double(c->GetChar()->GetAttribute(AttrCaldariTechTimePercent).get_int()) / 100.0; break;
-                case raceMinmatar:      into.charTimeMultiplier *= double(c->GetChar()->GetAttribute(AttrMinmatarTechTimePercent).get_int()) / 100.0; break;
-                case raceAmarr:         into.charTimeMultiplier *= double(c->GetChar()->GetAttribute(AttrAmarrTechTimePercent).get_int()) / 100.0; break;
-                case raceGallente:      into.charTimeMultiplier *= double(c->GetChar()->GetAttribute(AttrGallenteTechTimePercent).get_int()) / 100.0; break;
+                case raceCaldari:       if(c->GetChar()->HasAttribute(AttrCaldariTechTimePercent))into.charTimeMultiplier *= double(c->GetChar()->GetAttribute(AttrCaldariTechTimePercent).get_int()) / 100.0; break;
+                case raceMinmatar:      if(c->GetChar()->HasAttribute(AttrMinmatarTechTimePercent))into.charTimeMultiplier *= double(c->GetChar()->GetAttribute(AttrMinmatarTechTimePercent).get_int()) / 100.0; break;
+                case raceAmarr:         if(c->GetChar()->HasAttribute(AttrAmarrTechTimePercent))into.charTimeMultiplier *= double(c->GetChar()->GetAttribute(AttrAmarrTechTimePercent).get_int()) / 100.0; break;
+                case raceGallente:      if(c->GetChar()->HasAttribute(AttrGallenteTechTimePercent))into.charTimeMultiplier *= double(c->GetChar()->GetAttribute(AttrGallenteTechTimePercent).get_int()) / 100.0; break;
                 case raceJove:          break;
                 case racePirate:        break;
             }
