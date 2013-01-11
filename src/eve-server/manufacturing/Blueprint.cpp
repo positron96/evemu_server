@@ -116,7 +116,7 @@ BlueprintData::BlueprintData(
 : copy(_copy),
   materialLevel(_materialLevel),
   productivityLevel(_productivityLevel),
-  licensedProductionRunsRemaining(_licensedProductionRunsRemaining)
+  licensedProductionRunsRemaining(_copy ? _licensedProductionRunsRemaining : -1)
 {
 }
 
