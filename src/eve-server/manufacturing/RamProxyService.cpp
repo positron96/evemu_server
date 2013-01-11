@@ -140,7 +140,16 @@ PyResult RamProxyService::Handle_InstallJob(PyCallArgs &call) {
         _log(SERVICE__ERROR, "Failed to decode BOM location.");
         return NULL;
     }
+    
+    PathElement lastContainer;
+    if ( !lastContainer.Decode ( args.bomPath->GetItem( args.bomPath->size()-1 ) ) ) {
+        _log(SERVICE__ERROR, "Failed to decode last element of BOM location.");
+        return NULL;
+    }
+    InventoryItemRef lastContItem = m_manager->item_factory.GetItem(lastContainer.locationID );
+    uint32 solarSystemID = lastContItem->locationID(); 
 
+    
     // verify call
     _VerifyInstallJob_Call( args, (InventoryItemRef)installedItem, pathBomLocation, call.client );
 
@@ -150,7 +159,11 @@ PyResult RamProxyService::Handle_InstallJob(PyCallArgs &call) {
         return NULL;
 
     // I understand sent maxJobStartTime as a limit, so this checks whether it's in limit
-    if(rsp.maxJobStartTime > call.byname["maxJobStartTime"]->AsLong()->value())
+    // sometimes it's an integer, sometimes it's long, strange but true.
+    PyRep *callMaxJob = call.byname["maxJobStartTime"];
+    uint64 callMaxJobVal = callMaxJob->IsLong() ? 
+        callMaxJob->AsLong()->value() : callMaxJob->AsInt()->value();
+    if(rsp.maxJobStartTime > callMaxJobVal)
         throw(PyException(MakeUserError("RamCannotGuaranteeStartTime")));
 
     // query required items for activity
@@ -175,7 +188,7 @@ PyResult RamProxyService::Handle_InstallJob(PyCallArgs &call) {
 
         // calculate proper start time
         uint64 beginProductionTime = Win32TimeNow();
-        if(beginProductionTime < (uint32)rsp.maxJobStartTime)
+        if(beginProductionTime < rsp.maxJobStartTime)
             beginProductionTime = rsp.maxJobStartTime;
 
         // register our job
@@ -189,7 +202,7 @@ PyResult RamProxyService::Handle_InstallJob(PyCallArgs &call) {
             args.description.c_str(),
             args.runs,
             (EVEItemFlags)args.flagOutput,
-            pathBomLocation.locationID,
+            solarSystemID,
             args.licensedProductionRuns ) )
         {
             return NULL;
