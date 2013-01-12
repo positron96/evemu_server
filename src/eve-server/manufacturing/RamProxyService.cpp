@@ -124,11 +124,16 @@ PyResult RamProxyService::Handle_InstallJob(PyCallArgs &call) {
         _log(SERVICE__ERROR, "Failed to decode args.");
         return NULL;
     }
-
+    
+    if (call.byname["quoteOnly"]->AsInt()->value())
+        sLog.Debug("RamProxyService::Handle_InstallJob", "InstallJob with quoteOnly");
+    
     // load installed item
     InventoryItemRef installedItem = m_manager->item_factory.GetItem( args.installedItemID );
-    if( !installedItem )
+    if( !installedItem ) {
+        _log(SERVICE__ERROR, "Could not get installedItem");
         return NULL;
+    }
 
     // if output flag not set, put it where it was
     if(args.flagOutput == flagAutoFit)
@@ -155,8 +160,10 @@ PyResult RamProxyService::Handle_InstallJob(PyCallArgs &call) {
 
     // this calculates some useful multipliers ... Rsp_InstallJob is used as container ...
     Rsp_InstallJob rsp;
-    if(!_Calculate(args, (InventoryItemRef)installedItem, call.client, rsp))
+    if(!_Calculate(args, (InventoryItemRef)installedItem, call.client, rsp)) {
+        _log(SERVICE__ERROR, "Could not _Calculate");
         return NULL;
+    }
 
     // I understand sent maxJobStartTime as a limit, so this checks whether it's in limit
     // sometimes it's an integer, sometimes it's long, strange but true.
@@ -168,8 +175,10 @@ PyResult RamProxyService::Handle_InstallJob(PyCallArgs &call) {
 
     // query required items for activity
     std::vector<RequiredItem> reqItems;
-    if(!m_db.GetRequiredItems(installedItem->typeID(), (EVERamActivity)args.activityID, reqItems))
+    if(!m_db.GetRequiredItems(installedItem->typeID(), (EVERamActivity)args.activityID, reqItems)) {
+        _log(SERVICE__ERROR, "Could not DB::GetRequiredItems");
         return NULL;
+    }
 
     // if 'quoteOnly' is 1 -> send quote, if 0 -> install job
     if(call.byname["quoteOnly"]->AsInt()->value())
@@ -205,6 +214,7 @@ PyResult RamProxyService::Handle_InstallJob(PyCallArgs &call) {
             solarSystemID,
             args.licensedProductionRuns ) )
         {
+            _log(SERVICE__ERROR, "Could not DB::InstallJob");
             return NULL;
         }
 
@@ -254,7 +264,6 @@ PyResult RamProxyService::Handle_InstallJob(PyCallArgs &call) {
                 }
             }
         }
-
         return NULL;
     }
 }
@@ -654,6 +663,7 @@ void RamProxyService::_VerifyInstallJob_Call(const Call_InstallJob &args, Invent
         // RamInstalledItemBadLocationStructure
         // RamInstalledItemInStructureNotInContainer
         // RamInstalledItemInStructureUnknownLocation
+        throw(PyException(MakeCustomError("POSes are not supported yet")));
     }
 
     // BOM LOCATION CHECK
@@ -744,9 +754,7 @@ void RamProxyService::_VerifyInstallJob_Install(const Rsp_InstallJob &rsp, const
 
             if(qtyNeeded > 0) {
                 std::map<std::string, PyRep *> args;
-                args["item"] = new PyString(
-                    m_manager->item_factory.GetType(cur->typeID)->name().c_str()
-                );
+                args["item"] = new PyInt( cur->typeID );
 
                 throw(PyException(MakeUserError("RamNeedMoreForJob", args)));
             }
