@@ -700,6 +700,14 @@ CREATE TABLE `npcStandings` (
 
 /*Data for the table `npcStandings` */
 
+
+/* Modify official table ramAssemblyLines */
+
+ALTER TABLE ramAssemblyLines MODIFY COLUMN nextFreeTime BIGINT UNSIGNED;
+
+UPDATE ramAssemblyLines SET nextFreeTime=0 WHERE nextFreeTime IS NULL;
+
+
 /*Table structure for table `ramAssemblyLineStationCostLogs` */
 
 DROP TABLE IF EXISTS `ramAssemblyLineStationCostLogs`;
