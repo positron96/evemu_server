@@ -503,18 +503,26 @@ void RamProxyService::_VerifyInstallJob_Call(const Call_InstallJob &args, Invent
     // ***********
     if(args.activityID == ramActivityManufacturing) {
         uint32 jobCount = m_db.CountManufacturingJobs(c->GetCharacterID());
-        if(c->GetChar()->GetAttribute(AttrManufactureSlotLimit).get_int() <= jobCount) {
+
+        uint charMaxJobs = c->GetChar()->GetAttribute(AttrManufactureSlotLimit).get_int() 
+            + c->GetChar()->GetSkillLevel(skillMassProduction)
+            + c->GetChar()->GetSkillLevel(skillAdvancedMassProduction);
+        if(charMaxJobs <= jobCount) {
             std::map<std::string, PyRep *> exceptArgs;
             exceptArgs["current"] = new PyInt(jobCount);
-            exceptArgs["max"] = c->GetChar()->GetAttribute(AttrManufactureSlotLimit).GetPyObject();
+            exceptArgs["max"] = new PyInt(charMaxJobs);
             throw(PyException(MakeUserError("MaxFactorySlotUsageReached", exceptArgs)));
         }
     } else {
+        uint charMaxJobs = c->GetChar()->GetAttribute(AttrMaxLaborotorySlots).get_int() 
+            + c->GetChar()->GetSkillLevel(skillLaboratoryOperation)
+            + c->GetChar()->GetSkillLevel(skillAdvancedLaboratoryOperation);
+            
         uint32 jobCount = m_db.CountResearchJobs(c->GetCharacterID());
-        if(c->GetChar()->GetAttribute(AttrMaxLaborotorySlots).get_int() <= jobCount) {
+        if(charMaxJobs <= jobCount) {
             std::map<std::string, PyRep *> exceptArgs;
             exceptArgs["current"] = new PyInt(jobCount);
-            exceptArgs["max"] = c->GetChar()->GetAttribute(AttrMaxLaborotorySlots).GetPyObject();
+            exceptArgs["max"] = new PyInt(charMaxJobs);
             throw(PyException(MakeUserError("MaxResearchFacilitySlotUsageReached", exceptArgs)));
         }
     }
@@ -706,10 +714,7 @@ void RamProxyService::_VerifyInstallJob_Install(const Rsp_InstallJob &rsp, const
     std::vector<InventoryItemRef> skills, items;
 
     // get skills ...
-    std::set<EVEItemFlags> flags;
-    flags.insert(flagSkill);
-    flags.insert(flagSkillInTraining);
-    c->GetChar()->FindByFlagSet(flags, skills);
+    c->GetChar()->GetSkillsList(skills);
 
     // ... and items
     _GetBOMItems( pathBomLocation, items );
@@ -720,16 +725,13 @@ void RamProxyService::_VerifyInstallJob_Install(const Rsp_InstallJob &rsp, const
     for(; cur != end; cur++) {
         // check skill (quantity is required level)
         if(cur->isSkill) {
-            /* Commented out until we get skills working some different way ...
-            if(GetSkillLevel(skills, cur->typeID) < cur->quantity) {
+            if(c->GetChar()->GetSkillLevel(cur->typeID) < cur->quantity) {
                 std::map<std::string, PyRep *> args;
-                args["item"] = new PyString(
-                    m_manager->item_factory.type(cur->typeID)->name().c_str()
-                );
+                args["item"] = new PyInt(cur->typeID);
                 args["skillLevel"] = new PyInt(cur->quantity);
 
                 throw(PyException(MakeUserError("RamNeedSkillForJob", args)));
-            }*/
+            }
         } else {
             // check materials
 
@@ -795,6 +797,8 @@ bool RamProxyService::_Calculate(const Call_InstallJob &args, InventoryItemRef i
     if(!m_db.GetAssemblyLineProperties(args.installationAssemblyLineID, into.materialMultiplier, into.timeMultiplier, into.installCost, into.usageCost))
         return false;
 
+    Character *ch = c->GetChar().get();
+    
     const ItemType *productType;
     // perform some activity-specific actions
     switch(args.activityID) {
@@ -811,8 +815,11 @@ bool RamProxyService::_Calculate(const Call_InstallJob &args, InventoryItemRef i
             into.materialMultiplier *= bp->materialMultiplier();
             into.timeMultiplier *= bp->timeMultiplier();
 
-            into.charMaterialMultiplier = c->GetChar()->GetAttribute(AttrManufactureCostMultiplier).get_float();
-            into.charTimeMultiplier = c->GetChar()->GetAttribute(AttrManufactureTimeMultiplier).get_float();
+            into.charMaterialMultiplier = ch->GetAttribute(AttrManufactureCostMultiplier).get_float()
+                    * (1 - 0.04*ch->GetSkillLevel(skillProductionEfficiency));
+            
+            into.charTimeMultiplier = ch->GetAttribute(AttrManufactureTimeMultiplier).get_float() 
+                    * (1 - 0.04*ch->GetSkillLevel(skillIndustry) );
 
             switch(productType->race()) {
                 case raceCaldari:       if(c->GetChar()->HasAttribute(AttrCaldariTechTimePercent))into.charTimeMultiplier *= double(c->GetChar()->GetAttribute(AttrCaldariTechTimePercent).get_int()) / 100.0; break;
@@ -833,8 +840,9 @@ bool RamProxyService::_Calculate(const Call_InstallJob &args, InventoryItemRef i
             productType = &installedItem->type();
 
             into.productionTime = bp->type().researchProductivityTime();
-            into.charMaterialMultiplier = double(c->GetChar()->GetAttribute(AttrResearchCostPercent).get_int()) / 100.0;
-            into.charTimeMultiplier = c->GetChar()->GetAttribute(AttrManufacturingTimeResearchSpeed).get_float();
+            into.charMaterialMultiplier = double(ch->GetAttribute(AttrResearchCostPercent).get_int()) / 100.0;
+            into.charTimeMultiplier = ch->GetAttribute(AttrManufacturingTimeResearchSpeed).get_float()
+                    * (1 - 0.05*ch->GetSkillLevel(skillResearch));
             break;
         }
         /*
@@ -847,7 +855,8 @@ bool RamProxyService::_Calculate(const Call_InstallJob &args, InventoryItemRef i
 
             into.productionTime = bp->type().researchMaterialTime();
             into.charMaterialMultiplier = double(c->GetChar()->GetAttribute(AttrResearchCostPercent).get_int()) / 100.0;
-            into.charTimeMultiplier = c->GetChar()->GetAttribute(AttrMineralNeedResearchSpeed).get_float();
+            into.charTimeMultiplier = ch->GetAttribute(AttrMineralNeedResearchSpeed).get_float()
+                    * (1 - 0.05*ch->GetSkillLevel(skillMetallurgy));
             break;
         }
         /*
@@ -862,7 +871,8 @@ bool RamProxyService::_Calculate(const Call_InstallJob &args, InventoryItemRef i
             into.productionTime = (bp->type().researchCopyTime() / bp->type().maxProductionLimit()) * args.licensedProductionRuns;
 
             into.charMaterialMultiplier = double(c->GetChar()->GetAttribute(AttrResearchCostPercent).get_int()) / 100.0;
-            into.charTimeMultiplier = c->GetChar()->GetAttribute(AttrCopySpeedPercent).get_float();
+            into.charTimeMultiplier = c->GetChar()->GetAttribute(AttrCopySpeedPercent).get_float()
+                    * (1 - 0.05*ch->GetSkillLevel(skillScience));
             break;
         }
         default: {
