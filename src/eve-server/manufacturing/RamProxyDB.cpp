@@ -266,7 +266,11 @@ bool RamProxyDB::GetAssemblyLineVerifyProperties(const uint32 assemblyLineID, ui
     return true;
 }
 
-bool RamProxyDB::InstallJob(const uint32 ownerID, const  uint32 installerID, const uint32 assemblyLineID, const uint32 installedItemID, const uint64 beginProductionTime, const uint64 endProductionTime, const char *description, const uint32 runs, const EVEItemFlags outputFlag, const uint32 installedInSolarSystem, const int32 licensedProductionRuns) {
+bool RamProxyDB::InstallJob(const uint32 ownerID, const  uint32 installerID, 
+        const uint32 assemblyLineID, const uint32 installedItemID, 
+        const uint64 beginProductionTime, const uint64 endProductionTime, 
+        const char *description, const uint32 runs, const EVEItemFlags outputFlag, 
+        const uint32 installedInSolarSystem, const int32 licensedProductionRuns) {
     DBerror err;
 
     // insert job
@@ -366,7 +370,28 @@ uint32 RamProxyDB::CountResearchJobs(const uint32 installerID) {
 
 bool RamProxyDB::GetRequiredItems(const uint32 typeID, const EVERamActivity activity, std::vector<RequiredItem> &into) {
     DBQueryResult res;
-
+    
+    DBResultRow row;
+    
+    if (activity == 1) {
+        if(!sDatabase.RunQuery(res,
+            "SELECT"
+            " material.materialTypeID,"
+            " material.quantity"
+            " FROM invTypeMaterials as material "
+            " LEFT JOIN invBlueprintTypes AS bpTypes "
+            "   ON material.typeID = bpTypes.productTypeID"
+            " WHERE bpTypes.blueprintTypeID = %u",
+            typeID) )
+        {
+            _log(DATABASE__ERROR, "Failed to query data to build BillOfMaterials: %s.", res.error.c_str());
+            return false;
+        }
+        // only materials in this table
+        while(res.GetRow(row))
+            into.push_back(RequiredItem(row.GetUInt(0), row.GetUInt(1), 1.0, false));
+    }
+    
     if(!sDatabase.RunQuery(res,
         "SELECT"
         " material.requiredTypeID,"

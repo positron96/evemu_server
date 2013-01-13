@@ -737,7 +737,7 @@ void RamProxyService::_VerifyInstallJob_Install(const Rsp_InstallJob &rsp, const
             uint32 qtyNeeded = static_cast<uint32>(ceil(cur->quantity * rsp.materialMultiplier * runs));
             if(cur->damagePerJob == 1.0)
                 qtyNeeded = static_cast<uint32>(ceil(qtyNeeded * rsp.charMaterialMultiplier));   // skill multiplier is applied only on fully consumed materials
-
+         
             std::vector<InventoryItemRef>::iterator curi, endi;
             curi = items.begin();
             endi = items.end();
@@ -747,8 +747,10 @@ void RamProxyService::_VerifyInstallJob_Install(const Rsp_InstallJob &rsp, const
                 ) {
                     if((*curi)->quantity() < qtyNeeded)
                         qtyNeeded -= (*curi)->quantity();
-                    else
+                    else {
+                        qtyNeeded = 0;
                         break;
+                    }
                 }
             }
 
