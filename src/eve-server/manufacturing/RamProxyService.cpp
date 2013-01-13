@@ -185,7 +185,9 @@ PyResult RamProxyService::Handle_InstallJob(PyCallArgs &call) {
     {
         _EncodeBillOfMaterials(reqItems, rsp.materialMultiplier, rsp.charMaterialMultiplier, args.runs, rsp.bom);
         _EncodeMissingMaterials(reqItems, pathBomLocation, call.client, rsp.materialMultiplier, rsp.charMaterialMultiplier, args.runs, rsp.missingMaterials);
-
+        
+        // only enough, EVE shows this value halved.
+        rsp.charMaterialMultiplier *= 2;
         return rsp.Encode();
     }
     else
@@ -888,7 +890,7 @@ bool RamProxyService::_Calculate(const Call_InstallJob &args, InventoryItemRef i
         return false;
 
     // calculate the remaining things
-    into.productionTime *= static_cast<int32>(into.timeMultiplier * into.charTimeMultiplier * args.runs);
+    into.productionTime = static_cast<int32>(into.productionTime * into.timeMultiplier * into.charTimeMultiplier * args.runs);
     into.usageCost *= ceil(into.productionTime / 3600.0);
     into.cost = into.installCost + into.usageCost;
 
@@ -975,7 +977,7 @@ void RamProxyService::_EncodeMissingMaterials(const std::vector<RequiredItem> &r
                 if(cur->isSkill)
                     qtyReq -= std::min((uint32)qtyReq, (uint32)(*curi)->GetAttribute(AttrSkillLevel).get_int());
                 else
-                    qtyReq -= std::min((uint32)qtyReq, (uint32)(*curi)->GetAttribute(AttrQuantity).get_int());
+                    qtyReq -= std::min((uint32)qtyReq, (uint32)(*curi)->quantity() );
             }
         }
 
