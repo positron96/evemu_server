@@ -411,7 +411,6 @@ bool RamProxyDB::GetRequiredItems(const uint32 typeID, const EVERamActivity acti
         return false;
     }
 
-    DBResultRow row;
     while(res.GetRow(row))
         into.push_back(RequiredItem(row.GetUInt(0), row.GetUInt(1), row.GetFloat(2), row.GetInt(3) ? true : false));
 
