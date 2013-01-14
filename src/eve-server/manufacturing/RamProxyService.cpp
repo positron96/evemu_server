@@ -187,7 +187,7 @@ PyResult RamProxyService::Handle_InstallJob(PyCallArgs &call) {
         _EncodeMissingMaterials(reqItems, pathBomLocation, call.client, rsp.materialMultiplier, rsp.charMaterialMultiplier, args.runs, rsp.missingMaterials);
         
         // only enough, EVE shows this value halved.
-        rsp.charMaterialMultiplier *= 2;
+        rsp.charTimeMultiplier *= 2;
         return rsp.Encode();
     }
     else
