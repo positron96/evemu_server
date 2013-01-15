@@ -730,7 +730,7 @@ void Character::ClearSkillQueue()
     m_skillQueue.clear();
 }
 
-void Character::UpdateSkillQueue(bool saveAfter)
+void Character::UpdateSkillQueue(bool saveAfter /*=true*/)
 {
     Client *c = m_factory.entity_list.FindCharacter( itemID() );
 
@@ -814,8 +814,8 @@ void Character::UpdateSkillQueue(bool saveAfter)
             EvilNumber SPPerMinute = GetSPPerMin( currentTraining );
             EvilNumber NextLevel = currentTraining->GetAttribute(AttrSkillLevel) + 1;
             EvilNumber SPToNextLevel = currentTraining->GetSPForLevel( NextLevel ) - currentTraining->GetAttribute(AttrSkillPoints);
-            sLog.Debug( "    ", "Training skill at %f SP/min", SPPerMinute.get_float() );
-            sLog.Debug( "    ", "%f SP to next Level of %d", SPToNextLevel.get_float(), NextLevel.get_int() );
+            sLog.Debug( "Character::UpdateSkillQueue()", "  Training skill at %f SP/min", SPPerMinute.get_float() );
+            sLog.Debug( "Character::UpdateSkillQueue()", "  %f SP to next Level of %d", SPToNextLevel.get_float(), NextLevel.get_int() );
 
             SPPerMinute.to_float();
             SPToNextLevel.to_float();
