@@ -831,7 +831,7 @@ PyResult Command_giveskill( Client* who, CommandDB* db, PyServiceMgr* services, 
             // Character already has this skill, so let's get the current level and check to see
             // if we need to update its level to what's required:
             SkillRef oldSkill = character->GetSkill( typeID );
-            oldSkillLevel = oldSkill->GetAttribute( AttrSkillLevel );
+            oldSkillLevel = oldSkill->GetLevel( );
 
             // Now check the current level to the required level and update it
             if( oldSkillLevel < level )

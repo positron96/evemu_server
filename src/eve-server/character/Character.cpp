@@ -510,7 +510,7 @@ bool Character::HasSkillTrainedToLevel(uint32 skillTypeID, uint32 skillLevel) co
         return false;
 
     // Second, check for required minimum level of skill, note it must already be trained to this level:
-    if( requiredSkill->GetAttribute(AttrSkillLevel) < skillLevel )
+    if( requiredSkill->GetLevel() < skillLevel )
         return false;
 
     return true;
@@ -566,7 +566,7 @@ EvilNumber Character::GetSPPerMin( SkillRef skill )
     ////3374 - Skill Learning
     //SkillRef skillLearning = GetSkill( 3374 );
     //if( skillLearning )
-    //    skillLearningLevel = skillLearning->GetAttribute(AttrSkillLevel);
+    //    skillLearningLevel = skillLearning->GetLevel();
 
     primarySPperMin = primarySPperMin + secondarySPperMin / 2.0f;
     //primarySPperMin = primarySPperMin * (EvilNumber(1.0f) + EvilNumber(0.02f) * skillLearningLevel);
@@ -649,7 +649,7 @@ bool Character::InjectSkillIntoBrain(SkillRef skill, uint8 level)
         //oldSkill->attributes.SetNotify(true);
         //oldSkill->Set_skillLevel( level );
         //oldSkill->Set_skillPoints( pow(2, ( 2.5 * level ) - 2.5 ) * SKILL_BASE_POINTS * ( oldSkill->attributes.GetInt( oldSkill->attributes.Attr_skillTimeConstant ) ) );
-	oldSkill->SetAttribute(AttrSkillLevel, level);
+	oldSkill->SetLevel(level);
         EvilNumber eTmp = skill->GetAttribute(AttrSkillTimeConstant) * ( pow(2,( 2.5 * level) - 2.5 ) * EVIL_SKILL_BASE_POINTS );
         oldSkill->SetAttribute(AttrSkillPoints, eTmp);
 	oldSkill->SetFlag(flagSkill);
@@ -673,7 +673,7 @@ bool Character::InjectSkillIntoBrain(SkillRef skill, uint8 level)
     else
         skill->MoveInto( *this, flagSkill );
 
-    skill->SetAttribute(AttrSkillLevel, level);
+    skill->SetLevel(level);
     //TODO: get right number of skill points
 
     //skill->Set_skillPoints( pow(2,( 2.5 * level) - 2.5 ) * SKILL_BASE_POINTS * ( skill->attributes.GetInt( skill->attributes.Attr_skillTimeConstant ) ) );
@@ -761,7 +761,7 @@ void Character::UpdateSkillQueue(bool saveAfter /*=true*/)
 
             EvilNumber timeEndTrain = currentTraining->GetAttribute(AttrExpiryTime);
             if (timeEndTrain != 0) {
-                EvilNumber nextLevelSP = currentTraining->GetSPForLevel( currentTraining->GetAttribute(AttrSkillLevel) + 1 );
+                EvilNumber nextLevelSP = currentTraining->GetSPForLevel( currentTraining->GetLevel() + 1 );
                 EvilNumber SPPerMinute = GetSPPerMin( currentTraining );
                 EvilNumber minRemaining = (timeEndTrain - EvilNumber(Win32TimeNow())) / (double)Win32Time_Minute;
 
@@ -812,7 +812,7 @@ void Character::UpdateSkillQueue(bool saveAfter /*=true*/)
             sLog.Debug( "Character::UpdateSkillQueue()", "%s (%u): Starting training of skill %s (%u)",  m_itemName.c_str(), m_itemID, currentTraining->itemName().c_str(), currentTraining->itemID() );
 
             EvilNumber SPPerMinute = GetSPPerMin( currentTraining );
-            EvilNumber NextLevel = currentTraining->GetAttribute(AttrSkillLevel) + 1;
+            EvilNumber NextLevel = currentTraining->GetLevel() + 1;
             EvilNumber SPToNextLevel = currentTraining->GetSPForLevel( NextLevel ) - currentTraining->GetAttribute(AttrSkillPoints);
             sLog.Debug( "Character::UpdateSkillQueue()", "  Training skill at %f SP/min", SPPerMinute.get_float() );
             sLog.Debug( "Character::UpdateSkillQueue()", "  %f SP to next Level of %d", SPToNextLevel.get_float(), NextLevel.get_int() );
@@ -847,8 +847,8 @@ void Character::UpdateSkillQueue(bool saveAfter /*=true*/)
             // training has been finished:
             sLog.Debug( "Character::UpdateSkillQueue()", "%s (%u): Finishing training of skill %s (%u).", itemName().c_str(), itemID(), currentTraining->itemName().c_str(), currentTraining->itemID() );
 
-            currentTraining->SetAttribute(AttrSkillLevel, currentTraining->GetAttribute(AttrSkillLevel) + 1 );
-            currentTraining->SetAttribute(AttrSkillPoints, currentTraining->GetSPForLevel( currentTraining->GetAttribute(AttrSkillLevel) ), true);
+            currentTraining->SetLevel(currentTraining->GetLevel() + 1 );
+            currentTraining->SetAttribute(AttrSkillPoints, currentTraining->GetSPForLevel( currentTraining->GetLevel() ), true);
 
             nextStartTime = currentTraining->GetAttribute(AttrExpiryTime);
             currentTraining->SetAttribute(AttrExpiryTime, 0);
@@ -984,7 +984,7 @@ void Character::AddItem(InventoryItemRef item)
                 // Make it singleton and set initial skill values.
                 skill->ChangeSingleton( true );
 
-                skill->SetAttribute(AttrSkillLevel, 0);
+                skill->SetLevel(0);
                 skill->SetAttribute(AttrSkillPoints, 0);
 
                 if( skill->flag() != flagSkillInTraining )
@@ -1094,8 +1094,8 @@ void Character::_CalculateTotalSPTrained()
     // NOT including the skill currently being trained:
     double exponent = 0.0f;
     double totalSP = 0.0f;
-    EvilNumber skillLevel;
-    EvilNumber skillRank;
+    uint8 skillLevel;
+    uint8 skillRank;
     std::vector<InventoryItemRef> skills;
     GetSkillsList( skills );
     std::vector<InventoryItemRef>::iterator cur, end;
@@ -1104,10 +1104,10 @@ void Character::_CalculateTotalSPTrained()
     for(; cur != end; cur++)
     {
         // Calculate exact SP from each skill and add to total SP
-        skillLevel = cur->get()->GetAttribute( AttrSkillLevel );
-        skillRank = cur->get()->GetAttribute( AttrSkillTimeConstant );
+        skillLevel = SkillRef::StaticCast( *cur )->GetLevel();
+        skillRank = cur->get()->GetAttribute( AttrSkillTimeConstant ).get_int();
         //totalSP += 250.0f * (double)(skillRank.get_int()) * pow(32.0, (double)(((double)(skillLevel.get_int()) - 1.0f) / 2.0f));
-        totalSP += EVIL_SKILL_BASE_POINTS * skillRank * e_pow(2, (2.5*(skillLevel - 1)));
+        totalSP += SKILL_BASE_POINTS * skillRank * std::pow(2, (2.5*(skillLevel - 1)));
     }
 
     m_totalSPtrained = totalSP;

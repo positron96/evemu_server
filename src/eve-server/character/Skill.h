@@ -27,6 +27,7 @@
 #define __SKILL__H__INCL__
 
 #include "inventory/InventoryItem.h"
+#include "inventory/AttributeEnum.h"
 
 class Character;
 
@@ -69,6 +70,21 @@ public:
      * @return Amount of SP required.
      */
     EvilNumber GetSPForLevel(EvilNumber level);
+	
+	/**
+     * Returns current level of this skill.
+     * Incapsulates GetAttribute(AttrSkillLevel) method
+     *
+     */
+    uint8 GetLevel() { return GetAttribute(AttrSkillLevel).get_int(); }
+	
+	/**
+     * Sets the level of skill..
+     * Incapsulates SetAttribute(AttrSkillLevel,) method
+     *
+     */
+    bool SetLevel(uint8 level) { return SetAttribute(AttrSkillLevel, level); }
+	
     /**
      * Checks whether requirements of skill has been fulfilled.
      *

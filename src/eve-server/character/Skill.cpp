@@ -27,7 +27,6 @@
 
 #include "character/Character.h"
 #include "character/Skill.h"
-#include "inventory/AttributeEnum.h"
 
 /*
  * Skill
@@ -107,7 +106,7 @@ bool Skill::SkillPrereqsComplete(Character &ch)
         if( !requiredSkill )
             return false;
 
-        if( GetAttribute(AttrRequiredSkill1Level) > requiredSkill->GetAttribute(AttrSkillLevel) )
+        if( GetAttribute(AttrRequiredSkill1Level) > requiredSkill->GetLevel() )
             return false;
     }
 
@@ -117,7 +116,7 @@ bool Skill::SkillPrereqsComplete(Character &ch)
         if( !requiredSkill )
             return false;
 
-        if( GetAttribute(AttrRequiredSkill2Level) > requiredSkill->GetAttribute(AttrSkillLevel) )
+        if( GetAttribute(AttrRequiredSkill2Level) > requiredSkill->GetLevel() )
             return false;
     }
 
@@ -127,7 +126,7 @@ bool Skill::SkillPrereqsComplete(Character &ch)
         if( !requiredSkill )
             return false;
 
-        if( GetAttribute(AttrRequiredSkill3Level) > requiredSkill->GetAttribute(AttrSkillLevel) )
+        if( GetAttribute(AttrRequiredSkill3Level) > requiredSkill->GetLevel() )
             return false;
     }
 
@@ -146,7 +145,7 @@ bool Skill::FitModuleSkillCheck(InventoryItemRef item, CharacterRef character)
         if( !requiredSkill )
             return false;
 
-        if( item->GetAttribute(AttrRequiredSkill1Level) > requiredSkill->GetAttribute(AttrSkillLevel) )
+        if( item->GetAttribute(AttrRequiredSkill1Level) > requiredSkill->GetLevel() )
             return false;
     }
 
@@ -157,7 +156,7 @@ bool Skill::FitModuleSkillCheck(InventoryItemRef item, CharacterRef character)
         if( !requiredSkill )
             return false;
 
-        if( item->GetAttribute(AttrRequiredSkill2Level) > requiredSkill->GetAttribute(AttrSkillLevel) )
+        if( item->GetAttribute(AttrRequiredSkill2Level) > requiredSkill->GetLevel() )
             return false;
     }
 
@@ -168,7 +167,7 @@ bool Skill::FitModuleSkillCheck(InventoryItemRef item, CharacterRef character)
         if( !requiredSkill )
             return false;
 
-        if( item->GetAttribute(AttrRequiredSkill3Level) > requiredSkill->GetAttribute(AttrSkillLevel) )
+        if( item->GetAttribute(AttrRequiredSkill3Level) > requiredSkill->GetLevel() )
             return false;
     }
 
@@ -179,7 +178,7 @@ bool Skill::FitModuleSkillCheck(InventoryItemRef item, CharacterRef character)
         if( !requiredSkill )
             return false;
 
-        if( item->GetAttribute(AttrRequiredSkill4Level) > requiredSkill->GetAttribute(AttrSkillLevel) )
+        if( item->GetAttribute(AttrRequiredSkill4Level) > requiredSkill->GetLevel() )
             return false;
     }
 
@@ -190,7 +189,7 @@ bool Skill::FitModuleSkillCheck(InventoryItemRef item, CharacterRef character)
         if( !requiredSkill )
             return false;
 
-        if( item->GetAttribute(AttrRequiredSkill5Level) > requiredSkill->GetAttribute(AttrSkillLevel) )
+        if( item->GetAttribute(AttrRequiredSkill5Level) > requiredSkill->GetLevel() )
             return false;
     }
 
@@ -201,7 +200,7 @@ bool Skill::FitModuleSkillCheck(InventoryItemRef item, CharacterRef character)
         if( !requiredSkill )
             return false;
 
-        if( item->GetAttribute(AttrRequiredSkill6Level) > requiredSkill->GetAttribute(AttrSkillLevel) )
+        if( item->GetAttribute(AttrRequiredSkill6Level) > requiredSkill->GetLevel() )
             return false;
     }
 

@@ -347,7 +347,7 @@ PyResult CharUnboundMgrService::Handle_CreateCharacterWithDoll(PyCallArgs &call)
         //_log(CLIENT__MESSAGE, "Training skill %u to level %d (%d points)", i->typeID(), i->skillLevel(), i->skillPoints());
         //i->Set_skillLevel( cur->second );
         skillLevel = cur->second;
-        i->SetAttribute(AttrSkillLevel, skillLevel );
+        i->SetLevel( skillLevel );
         //i->Set_skillPoints( i->GetSPForLevel( cur->second ) );
         skillPoints = i->GetSPForLevel( EvilNumber((uint64)cur->second) );
         skillPoints.to_float();

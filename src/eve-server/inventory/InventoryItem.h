@@ -46,7 +46,8 @@ class ItemRowset_Row;
  * however, the creation and destruction time logic is why it has not been done.
  */
 
-//extern const uint32 SKILL_BASE_POINTS;
+extern const uint32 SKILL_BASE_POINTS;
+//TODO: remove usage of this evil stuff
 extern const EvilNumber EVIL_SKILL_BASE_POINTS;
 extern const int32 ITEM_DB_SAVE_TIMER_EXPIRY;
 
