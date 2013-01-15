@@ -261,7 +261,13 @@ PyResult SkillMgrBound::Handle_CharStartTrainingSkillByTypeID( PyCallArgs& call 
         return NULL;
     }
 
-    sLog.Debug( "SkillMgrBound", "Called CharStartTrainingSkillByTypeID stub." );
+    sLog.Debug( "SkillMgrBound", "Called CharStartTrainingSkillByTypeID(%d)", args.arg );
+    CharacterRef ch = call.client->GetChar();
+    SkillRef skill = ch->GetSkill(args.arg);
+    ch->ClearSkillQueue();
+    ch->AddToSkillQueue(skill->typeID(), skill->GetLevel()+1);
+    ch->UpdateSkillQueue();
+    call.client->SendNotifyMsg( "Your skillqueue was resumed with 1 item only, no matter what your client says.\nClose and open skillqueue window" );
 
     return NULL;
 }

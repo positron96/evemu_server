@@ -1064,7 +1064,8 @@ void Character::SaveCharacter()
 }
 
 void Character::SaveSkillQueue() const {
-    sLog.Debug( "Character::SaveSkillQueue()", "Saving skill queue of character %u.", itemID() );
+    sLog.Debug( "Character::SaveSkillQueue()", "Saving skill queue of %d items for character %u.",
+            m_skillQueue.size(), itemID() );
 
     // skill queue
     m_factory.db().SaveSkillQueue(
@@ -1075,7 +1076,7 @@ void Character::SaveSkillQueue() const {
 
 void Character::SaveCertificates() const
 {
-    sLog.Debug( "Character::SaveCertificates", "Saving Implants of character %u", itemID() );
+    sLog.Debug( "Character::SaveCertificates", "Saving certificates of character %u", itemID() );
 
     m_factory.db().SaveCertificates(
         itemID(),
