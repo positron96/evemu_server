@@ -419,6 +419,9 @@ uint32 Character::_Spawn(ItemFactory &factory,
 
 bool Character::_Load()
 {
+    if( !Owner::_Load() ) 
+        return false;
+    
     if( !LoadContents( m_factory ) )
         return false;
 
@@ -433,7 +436,7 @@ bool Character::_Load()
     if( !m_factory.db().LoadCertificates( itemID(), m_certificates ) )
         return false;
 
-    return Owner::_Load();
+    return true;
 }
 
 void Character::Delete() {
@@ -768,7 +771,7 @@ void Character::UpdateSkillQueue(bool saveAfter /*=true*/)
                 //currentTraining->Set_skillPoints( nextLevelSP - (minRemaining * SPPerMinute) );
                 EvilNumber skillPointsTrained = nextLevelSP - (minRemaining * SPPerMinute);
                 currentTraining->SetAttribute(AttrSkillPoints, skillPointsTrained);
-                sLog.Debug( "", "Skill %s (%u) trained %u skill points before termination from training queue", currentTraining->itemName().c_str(), currentTraining->itemID(), skillPointsTrained.get_float() );
+                sLog.Debug( "Character::UpdateSkillQueue()", "Skill %s (%u) trained %u skill points before termination from training queue", currentTraining->itemName().c_str(), currentTraining->itemID(), skillPointsTrained.get_float() );
             }
 
             currentTraining->SetAttribute(AttrExpiryTime, 0);
@@ -827,7 +830,7 @@ void Character::UpdateSkillQueue(bool saveAfter /*=true*/)
             currentTraining->SetAttribute(AttrExpiryTime, dbl_timeTraining);    // Set server-side
                                                                                 // skill expiry + 10 sec
 
-            sLog.Debug( "    ", "Calculated time to complete training = %s", Win32TimeToString((uint64)dbl_timeTraining).c_str() );
+            sLog.Debug( "Character::UpdateSkillQueue()", "Calculated time to complete training = %s", Win32TimeToString((uint64)dbl_timeTraining).c_str() );
 
             if( c != NULL )
             {
@@ -949,7 +952,7 @@ PyTuple *Character::GetSkillQueue() {
 
         el.typeID = cur->typeID;
         el.level = cur->level;
-
+        sLog.Debug("Character::GetSkillQueue", "returning skill %u at level %d", cur->typeID, cur->level);
         list->AddItem( el.Encode() );
     }
 
